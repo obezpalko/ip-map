@@ -104,25 +104,32 @@ for i in SPESIAL_NETWORKS:
     
 SRC='z-i/dump.csv'
 blocked_list = []
-
+small_nets = []
 reader = csv.reader(open(SRC, mode='r', encoding='cp1251'), delimiter=';')
 for row in reader:
     for i in row[0].split(' | '):
         k = i.split('/')
+        net = False
         if i.find('/') < 0:
             try:
-                blocked_list.append(IPNetwork("{}/32".format(i)))
+                net = IPNetwork("{}/32".format(i))
+                
             except AddrFormatError:
                 pass
         else:
-            blocked_list.append(IPNetwork(i))
+            net = IPNetwork(i)
+        if net:
+            if net and net.prefixlen > 24:
+                small_nets.append(net)
+            else:
+                blocked_list.append(net)
 
 blocked_set = set(blocked_list)
 count = 0
-# merged_list = cidr_merge(list(blocked_set))
+merged_small = cidr_merge(list(small_nets))
 merged_list = list(blocked_set)
 
-for i in merged_list:
+for i in merged_list + merged_small:
     k = "{}".format(i).split('.')
     (x, y) = getlocation(int(k[0]), 256)
     (x1, y1) = getlocation(int(k[1]), 16)
