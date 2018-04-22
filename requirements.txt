@@ -1,2 +1,4 @@
 netaddr
 Pillow
+requests
+dnspython

@@ -14,6 +14,7 @@
     "149.154.164.0/22": "Various Registries (Maintained by ARIN)",
     "149.154.168.0/22": "Various Registries (Maintained by ARIN)",
     "149.154.172.0/22": "Various Registries (Maintained by ARIN)",
+    "159.122.128.0/18": "ORG-STI12-RIPE",
     "159.203.0.0/16": "DigitalOcean, LLC",
     "159.65.0.0/16": "DigitalOcean, LLC",
     "159.89.0.0/16": "Various Registries (Maintained by ARIN)",
@@ -21,7 +22,9 @@
     "167.99.0.0/16": "Various Registries (Maintained by ARIN)",
     "169.254.0.0/16": "IANA",
     "172.16.0.0/12": "IANA",
+    "174.104.0.0/15": "American Registry for Internet Numbers",
     "174.138.0.0/17": "American Registry for Internet Numbers",
+    "176.67.169.0/24": "RIPE NCC",
     "178.239.88.0/21": "ORG-RIMU1-RIPE",
     "178.63.0.0/16": "ORG-HOA1-RIPE",
     "18.130.0.0/16": "Amazon Data Services UK",
@@ -81,5 +84,6 @@
     "91.108.56.0/22": "RIPE NCC",
     "91.108.8.0/22": "RIPE NCC",
     "91.121.0.0/16": "ORG-OS3-RIPE",
-    "94.177.224.0/21": "ORG-Ts9-RIPE"
+    "94.177.224.0/21": "ORG-Ts9-RIPE",
+    "98.158.176.0/20": "American Registry for Internet Numbers"
 }

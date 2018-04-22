@@ -9,38 +9,15 @@ from datetime import date
 import subprocess
 from whois import WhoisCache
 
+from addresses import IANA, amazon, google
 
-
-SPESIAL_NETWORKS = [
-    '0.0.0.0/8', 
-    '10.0.0.0/8',
-    '100.64.0.0/10',
-    '127.0.0.0/8',
-    '169.254.0.0/16',
-    '172.16.0.0/12',
-    '192.0.0.0/24',
-    '192.0.0.0/29',
-    '192.0.0.8/32',
-    '192.0.0.9/32',
-    '192.0.0.10/32',
-    '192.0.0.170/32',
-    '192.0.0.171/32',
-    '192.0.2.0/24',
-    '192.31.196.0/24',
-    '192.52.193.0/24',
-    '192.88.99.0/24',
-    '192.168.0.0/16',
-    '192.175.48.0/24',
-    '198.18.0.0/15',
-    '198.51.100.0/24',
-    '203.0.113.0/24',
-    '240.0.0.0/4',
-    '255.255.255.255/32'
-]
 
 colors = {
-    'Amazon' : (255,128,0,255),
-    'Google' : (255,0,128,255),
+    'IANA': (64,255,64,64),
+    'Amazon' : (255,128,0,128),
+    'Amazon_GLOBAL' : (255,128,0,255),
+    'Google' : (255,0,128,128),
+    'Google_GLOBAL' : (255,0,128,255),
     'A100 ROW': (255, 128, 128, 255)
 }
 
@@ -86,22 +63,39 @@ def getsize(mask):
     except KeyError:
         return (0, 0)
 
+def draw_networks(draw, netlist={}, color=(127,127,127,127), font=None, whois=False):
+    for i in netlist:
+        n = IPNetwork(i)
+        k = "{}".format(n.network).split('.')
+        (x, y) = getlocation(int(k[0]), 256)
+        (x1, y1) = getlocation(int(k[1]), 16)
+        (sx, sy) = getsize(n.prefixlen)
+        draw.rectangle([(x+x1, y+y1), (x+x1+sx, y+y1+sy)], fill=color)
+        description = ""
+        if n.prefixlen <= 14:
+            if whois:
+                description = whois_cache.get("{}/{}".format(n.network, n.prefixlen))
+            else:
+                description = netlist[i]
+
+            draw.text(
+                [x+x1,y+y1],
+                "{} {}".format(i, description),
+                font=font)
+
+
 whois_cache = WhoisCache('.whois_cache.json')
 
 img = Image.new('RGBA', (16*256, 16*256), (255,255,255,0))
 draw = ImageDraw.Draw(img)
 font = ImageFont.load_default()
-for i in SPESIAL_NETWORKS:
-    n = IPNetwork(i)
-    k = "{}".format(n.network).split('.')
-    (x, y) = getlocation(int(k[0]), 256)
-    (x1, y1) = getlocation(int(k[1]), 16)
-    (sx, sy) = getsize(n.prefixlen)
-    # print(i, n.network, (x, y), (x1, y1), (sx, sy))
-    draw.rectangle([(x+x1, y+y1), (x+x1+sx, y+y1+sy)], fill=(64,255,64,64))
-    if n.prefixlen <= 16:
-        draw.text([x+x1,y+y1], "{} {}".format(n.network, whois_cache.get("{}/{}".format(n.network, n.prefixlen))), font=font)
-    
+draw_networks(draw, IANA.Networks().get(), color=colors['IANA'], font=font)
+draw_networks(draw, amazon.Networks().get(), color=colors['Amazon_GLOBAL'], font=font)
+draw_networks(draw, google.Networks().get(), color=colors['Google_GLOBAL'], font=font)
+
+#  img.save("map-{}.png".format(date.today()))
+#  sys.exit()
+
 SRC='z-i/dump.csv'
 blocked_list = []
 small_nets = []
@@ -113,7 +107,7 @@ for row in reader:
         if i.find('/') < 0:
             try:
                 net = IPNetwork("{}/32".format(i))
-                
+
             except AddrFormatError:
                 pass
         else:
@@ -148,7 +142,7 @@ for i in merged_list:
         draw.text([x+x1,y+y1], "{} {}".format(i, whois_cache.get("{}/{}".format(i.network, i.prefixlen))), font=font)
     elif i.prefixlen <= 15:
         draw.text([x+x1,y+y1], "{}".format(i), font=font)
-        
+
 
 
 img.save("map-{}.png".format(date.today()))
